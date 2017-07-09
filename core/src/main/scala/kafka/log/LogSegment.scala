@@ -393,10 +393,12 @@ class LogSegment(val log: FileRecords,
     catch {
       case e: IOException => throw kafkaStorageException("log", e)
     }
+    index.forceUnmapOnWindows
     try index.renameTo(new File(CoreUtils.replaceSuffix(index.file.getPath, oldSuffix, newSuffix)))
     catch {
       case e: IOException => throw kafkaStorageException("index", e)
     }
+    timeIndex.forceUnmapOnWindows
     try timeIndex.renameTo(new File(CoreUtils.replaceSuffix(timeIndex.file.getPath, oldSuffix, newSuffix)))
     catch {
       case e: IOException => throw kafkaStorageException("timeindex", e)
