@@ -213,7 +213,15 @@ abstract class AbstractIndex[K, V](@volatile var file: File, val baseOffset: Lon
       case t: Throwable => error("Error when freeing index buffer", t)
     }
   }
-
+  
+  /**
+   * Forcefully free the buffer's mmap on Windows OS to match Linux default behaviour on shared file delete.
+   * Continue if not on Windows
+   */
+  def forceUnmapOnWindows() {
+    if (OperatingSystem.IS_WINDOWS)
+      CoreUtils.swallow(forceUnmap(mmap))
+  }
   /**
    * Execute the given function in a lock only if we are running on windows. We do this
    * because Windows won't let us resize a file while it is mmapped. As a result we have to force unmap it
